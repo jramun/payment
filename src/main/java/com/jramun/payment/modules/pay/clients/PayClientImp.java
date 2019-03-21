@@ -52,12 +52,12 @@ public class PayClientImp implements PayClient {
     }
 
     @Override
-    public String verification(String token) throws IOException {
+    public void verification(String token) throws IOException {
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("api", this.token));
         params.add(new BasicNameValuePair("token", token));
         HttpResponse response = http("POST", verifyUrl, params);
-        return new BasicResponseHandler().handleResponse(response);
+        new BasicResponseHandler().handleResponse(response);
     }
 
 
