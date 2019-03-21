@@ -1,4 +1,4 @@
-package com.jramun.payment.core;
+package com.jramun.payment;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
