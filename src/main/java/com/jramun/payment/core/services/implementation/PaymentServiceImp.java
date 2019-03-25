@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
+@SuppressWarnings("ALL")
 @Service
 public class PaymentServiceImp implements PaymentService {
 
