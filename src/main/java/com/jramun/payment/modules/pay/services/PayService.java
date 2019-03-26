@@ -8,7 +8,9 @@ public interface PayService {
 
     String send(double amount, String factorNumber, String mobile, String description) throws IOException, JSONException;
 
-    void callBack(int status, String factorNumber, String token);
+    String callBack(int status, String factorNumber, String token);
 
-    void verification(String token) throws IOException;
+    void verify(String token, String factorNumber) throws IOException;
+
+    void cancel(String token,String factorNumber);
 }

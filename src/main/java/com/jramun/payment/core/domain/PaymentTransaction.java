@@ -1,5 +1,8 @@
 package com.jramun.payment.core.domain;
 
+import com.jramun.payment.core.enumeration.PaymentGatewayType;
+import com.jramun.payment.core.enumeration.PaymentTransactionStatus;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
@@ -32,6 +35,10 @@ public class PaymentTransaction extends BaseEntity {
     private String cardNumber;
     @Column(name = "description")
     private String description;
+    @Column(name = "verify")
+    private boolean verify = false;
+    @Column(name = "delete")
+    private boolean delete = false;
 
     public PaymentTransaction(String token, String factorNumber, String paymentGatewayType,
                               double amount, String mobile, String description) {
@@ -61,8 +68,8 @@ public class PaymentTransaction extends BaseEntity {
         return paymentGatewayType;
     }
 
-    public void setPaymentGatewayType(String paymentGatewayType) {
-        this.paymentGatewayType = paymentGatewayType;
+    public void setPaymentGatewayType(PaymentGatewayType paymentGatewayType) {
+        this.paymentGatewayType = paymentGatewayType.getVal();
     }
 
     public double getAmount() {
@@ -85,8 +92,8 @@ public class PaymentTransaction extends BaseEntity {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatus(PaymentTransactionStatus status) {
+        this.status = status.getVal();
     }
 
     public String getCardNumber() {
@@ -111,5 +118,21 @@ public class PaymentTransaction extends BaseEntity {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public boolean isVerify() {
+        return verify;
+    }
+
+    public void setVerify(boolean verify) {
+        this.verify = verify;
+    }
+
+    public boolean isDelete() {
+        return delete;
+    }
+
+    public void setDelete(boolean delete) {
+        this.delete = delete;
     }
 }

@@ -1,10 +1,12 @@
-package com.jramun.payment.core.services;
+package com.jramun.payment.core.enumeration;
 
-public enum PaymentTransactionStatus {
-    SUCCESS("SUCCESS"), FIELD("FIELD");
+public enum PaymentGatewayType {
+
+    PAY("PAY"), ZARINPAL("ZARINPAL"), MELAT("MELAT");
+
     private String val;
 
-    PaymentTransactionStatus(String val) {
+    PaymentGatewayType(String val) {
         this.val = val;
     }
 

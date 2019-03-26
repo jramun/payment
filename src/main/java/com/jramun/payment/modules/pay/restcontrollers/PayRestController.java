@@ -17,10 +17,9 @@ import java.util.logging.Logger;
 @RequestMapping(value = "/pay")
 public class PayRestController {
 
-    @Value("${pay.redirect}")
+    @Value("${pay.server.redirect}")
     private String redirectUrl;
     private PayService payService;
-    private Logger logger = Logger.getLogger(PayRestController.class.getName());
 
     @Autowired
     public PayRestController(PayService payService) {
@@ -42,17 +41,23 @@ public class PayRestController {
 
     @GetMapping("/call-back")
     public ResponseEntity<String> callBack(@RequestParam(value = "status") int transactionStatus,
-                                           @RequestParam(value = "factorNumber") String factorNumber,
+                                           @RequestParam(value = "factor_number") String factorNumber,
                                            @RequestParam(value = "token") String token) {
-        payService.callBack(transactionStatus, factorNumber, token);
-        return new ResponseEntity<>(HttpStatus.OK);
+        String result = payService.callBack(transactionStatus, factorNumber, token);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verify(@RequestParam("token") String token) throws IOException {
-        payService.verification(token);
+    public ResponseEntity<String> verify(@RequestParam("factor_number") String factorNumber,
+                                         @RequestParam("token") String token) throws IOException {
+        payService.verify(token, factorNumber);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
+    @DeleteMapping("/cancel")
+    public ResponseEntity<String> cancel(@RequestParam("factor_number") String factorNumber,
+                                         @RequestParam("token") String token) {
+        payService.cancel(token, factorNumber);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

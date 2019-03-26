@@ -27,13 +27,13 @@ public class PayClientImp implements PayClient {
     @Value("${pay.token}")
     private String token;
 
-    @Value("${pay.api}")
+    @Value("${pay.api.send}")
     private String sendUrl;
 
-    @Value("${pay.verify}")
+    @Value("${pay.api.verify}")
     private String verifyUrl;
 
-    @Value("${pay.redirect}")
+    @Value("${pay.server.redirect}")
     private String redirect;
 
     @Override
