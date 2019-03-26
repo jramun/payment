@@ -8,5 +8,5 @@ public interface PayClient {
     String send(double amount, String factorNumber, String description, String mobile)
             throws IOException, JSONException;
 
-    void verification(String token) throws IOException;
+    void verification(String token, String factorNumber);
 }

@@ -1,11 +1,11 @@
 package com.jramun.payment.core.services.implementation;
 
 import com.jramun.payment.core.domain.PaymentTransaction;
-import com.jramun.payment.core.exceptions.PaymentException;
-import com.jramun.payment.core.exceptions.Status;
-import com.jramun.payment.core.repositories.TransactionRepository;
 import com.jramun.payment.core.enumeration.PaymentGatewayType;
 import com.jramun.payment.core.enumeration.PaymentTransactionStatus;
+import com.jramun.payment.core.exceptions.Status;
+import com.jramun.payment.core.exceptions.TransactionException;
+import com.jramun.payment.core.repositories.TransactionRepository;
 import com.jramun.payment.core.services.interfaces.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +33,7 @@ public class PaymentServiceImp implements PaymentService {
                                   String description, String mobile, PaymentGatewayType type) {
         if (repository.existsByFactorNumber(factorNumber) ||
                 repository.existsByToken(token))
-            throw new PaymentException(Status.EXCEPTION, "token,factor error");
+            throw new TransactionException(Status.EXIST_TRANSACTION, "token,factor error");
         PaymentTransaction transaction = new PaymentTransaction
                 (token, factorNumber, type.getVal(),
                         amount, mobile, description);
@@ -44,8 +44,12 @@ public class PaymentServiceImp implements PaymentService {
     @Transactional
     public void successTransaction(String token, String factorNumber) {
         if (!validation(token, factorNumber))
-            throw new PaymentException(Status.EXCEPTION, "token|factor error");
+            throw new TransactionException(Status.NOT_EXIST_TRANSACTION, "token|factor error");
         PaymentTransaction transaction = repository.findByFactorNumber(factorNumber);
+        if (transaction.isDeleted())
+            throw new TransactionException(Status.DELETE_TRANSACTION, "transaction is delete");
+        if (!transaction.getStatus().isEmpty())
+            throw new TransactionException(Status.STATUS_TRANSACTION, "transaction status is set, cannot set new status");
         transaction.setStatus(PaymentTransactionStatus.SUCCESS);
         repository.save(transaction);
     }
@@ -54,8 +58,12 @@ public class PaymentServiceImp implements PaymentService {
     @Transactional
     public void failedTransaction(String token, String factorNumber) {
         if (!validation(token, factorNumber))
-            throw new PaymentException(Status.EXCEPTION, "token|factor error");
+            throw new TransactionException(Status.NOT_EXIST_TRANSACTION, "token|factor error");
         PaymentTransaction transaction = repository.findByFactorNumber(factorNumber);
+        if (transaction.isDeleted())
+            throw new TransactionException(Status.DELETE_TRANSACTION, "transaction is delete");
+        if (!transaction.getStatus().isEmpty())
+            throw new TransactionException(Status.STATUS_TRANSACTION, "transaction status is set, cannot set new status");
         transaction.setStatus(PaymentTransactionStatus.FIELD);
         repository.save(transaction);
     }
@@ -63,24 +71,12 @@ public class PaymentServiceImp implements PaymentService {
     @Override
     public void deleteTransaction(String token, String factorNumber) {
         if (!validation(token, factorNumber))
-            throw new PaymentException(Status.EXCEPTION, "token|factor error");
+            throw new TransactionException(Status.NOT_EXIST_TRANSACTION, "token|factor error");
         PaymentTransaction transaction = repository.findByFactorNumber(factorNumber);
-        if (transaction.isVerify())
-            throw new PaymentException(Status.EXCEPTION, "transaction is verify, cannot delete error");
-        if (transaction.isDelete())
-            throw new PaymentException(Status.EXCEPTION, "transaction is delete, cannot delete error");
-        transaction.setDelete(true);
+        if (transaction.isDeleted())
+            throw new TransactionException(Status.DELETE_TRANSACTION, "transaction is delete, cannot delete error");
+        transaction.setDeleted(true);
         repository.save(transaction);
-    }
-
-    @Override
-    @Transactional
-    public String verification(String token, String factorNumber) {
-        if (!validation(token, factorNumber))
-            throw new PaymentException(Status.EXCEPTION, "token|factor error");
-        PaymentTransaction transaction = repository.findByFactorNumber(factorNumber);
-        transaction.setVerify(true);
-        return repository.save(transaction).getToken();
     }
 
     @Override

@@ -10,7 +10,5 @@ public interface PayService {
 
     String callBack(int status, String factorNumber, String token);
 
-    void verify(String token, String factorNumber) throws IOException;
-
-    void cancel(String token,String factorNumber);
+    void cancel(String token, String factorNumber);
 }

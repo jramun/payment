@@ -15,7 +15,5 @@ public interface PaymentService {
 
     void deleteTransaction(String token,String factorNumber);
 
-    String verification(String token, String factorNumber);
-
     boolean validate(String token, String factorNumber);
 }

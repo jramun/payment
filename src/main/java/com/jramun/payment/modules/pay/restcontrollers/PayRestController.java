@@ -1,5 +1,7 @@
 package com.jramun.payment.modules.pay.restcontrollers;
 
+import com.jramun.payment.core.exceptions.BadInputException;
+import com.jramun.payment.core.exceptions.Status;
 import com.jramun.payment.modules.pay.models.PayRequest;
 import com.jramun.payment.modules.pay.models.PayResponse;
 import com.jramun.payment.modules.pay.services.PayService;
@@ -8,10 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 @RestController
 @RequestMapping(value = "/pay")
@@ -27,8 +30,12 @@ public class PayRestController {
     }
 
     @PostMapping("/send")
-    public ResponseEntity<PayResponse> send(@RequestBody PayRequest request)
+    public ResponseEntity<PayResponse> send(@Valid @RequestBody PayRequest request, BindingResult result)
             throws IOException, JSONException {
+        if (result.hasErrors())
+            throw new BadInputException(result.toString(),result.getFieldErrors());
+
+
         double amount = request.getAmount();
         String mobile = request.getMobile();
         String description = request.getDescription();
@@ -45,13 +52,6 @@ public class PayRestController {
                                            @RequestParam(value = "token") String token) {
         String result = payService.callBack(transactionStatus, factorNumber, token);
         return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    @GetMapping("/verify")
-    public ResponseEntity<String> verify(@RequestParam("factor_number") String factorNumber,
-                                         @RequestParam("token") String token) throws IOException {
-        payService.verify(token, factorNumber);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/cancel")

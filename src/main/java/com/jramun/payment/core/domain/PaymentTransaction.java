@@ -30,15 +30,15 @@ public class PaymentTransaction extends BaseEntity {
     @Column(name = "mobile")
     private String mobile;
     @Column(name = "status")
-    private String status;
+    private String status = "";
     @Column(name = "card_number")
     private String cardNumber;
     @Column(name = "description")
     private String description;
-    @Column(name = "verify")
-    private boolean verify = false;
-    @Column(name = "delete")
-    private boolean delete = false;
+//    @Column(name = "verify")
+//    private boolean verify = false;
+    @Column(name = "deleted")
+    private boolean deleted = false;
 
     public PaymentTransaction(String token, String factorNumber, String paymentGatewayType,
                               double amount, String mobile, String description) {
@@ -119,20 +119,20 @@ public class PaymentTransaction extends BaseEntity {
     public void setToken(String token) {
         this.token = token;
     }
+//
+//    public boolean isVerify() {
+//        return verify;
+//    }
+//
+//    public void setVerify(boolean verify) {
+//        this.verify = verify;
+//    }
 
-    public boolean isVerify() {
-        return verify;
+    public boolean isDeleted() {
+        return deleted;
     }
 
-    public void setVerify(boolean verify) {
-        this.verify = verify;
-    }
-
-    public boolean isDelete() {
-        return delete;
-    }
-
-    public void setDelete(boolean delete) {
-        this.delete = delete;
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

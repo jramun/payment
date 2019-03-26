@@ -1,8 +1,8 @@
 package com.jramun.payment.modules.pay.services;
 
 import com.jramun.payment.core.enumeration.PaymentGatewayType;
-import com.jramun.payment.core.exceptions.PaymentException;
 import com.jramun.payment.core.exceptions.Status;
+import com.jramun.payment.core.exceptions.TransactionException;
 import com.jramun.payment.core.services.interfaces.PaymentService;
 import com.jramun.payment.modules.pay.clients.PayClient;
 import org.json.JSONException;
@@ -32,26 +32,19 @@ public class PayServiceImp implements PayService {
     }
 
     @Override
-    public String callBack(int status, String factorNumber, String token) {
-        if (status == 1)
+    public String callBack(int status, String factorNumber, String token){
+        if (status == 1) {
+            payClient.verification(token);
             paymentService.successTransaction(token, factorNumber);
-        else
+        } else
             paymentService.failedTransaction(token, factorNumber);
         return factorNumber;
     }
 
     @Override
-    public void verify(String token, String factorNumber) throws IOException {
-        if (!paymentService.validate(token, factorNumber))
-            throw new PaymentException(Status.EXCEPTION, "token|factor error");
-        payClient.verification(token);
-        paymentService.verification(token, factorNumber);
-    }
-
-    @Override
     public void cancel(String token, String factorNumber) {
         if (!paymentService.validate(token, factorNumber))
-            throw new PaymentException(Status.EXCEPTION, "token|factor error");
+            throw new TransactionException(Status.EXCEPTION, "token|factor error");
         paymentService.deleteTransaction(token, factorNumber);
     }
 }

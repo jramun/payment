@@ -1,5 +1,6 @@
 package com.jramun.payment.modules.pay.clients;
 
+import com.jramun.payment.modules.pay.exceptions.PayVerifyException;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -52,12 +53,17 @@ public class PayClientImp implements PayClient {
     }
 
     @Override
-    public void verification(String token) throws IOException {
+    public void verification(String token ,String factorNumber) {
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("api", this.token));
         params.add(new BasicNameValuePair("token", token));
-        HttpResponse response = http("POST", verifyUrl, params);
-        new BasicResponseHandler().handleResponse(response);
+        HttpResponse response;
+        try {
+            response = http("POST", verifyUrl, params);
+            new BasicResponseHandler().handleResponse(response);
+        } catch (IOException e) {
+            throw new PayVerifyException(token,factorNumber, "pay.ir, verification error");
+        }
     }
 
 
